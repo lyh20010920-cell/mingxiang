@@ -5,13 +5,12 @@ import { verifyToken } from '@/lib/auth';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 保护 /admin 路由（除了登录页面）
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    const token = request.cookies.get('admin_token')?.value;
-
+  // 只保护 /admin/messages 和 /admin/content 路由
+  if (pathname === '/admin/messages' || pathname === '/admin/content') {
+    const token = request.cookies.get('admin_token');
+    
     if (!token || !verifyToken(token)) {
-      const loginUrl = new URL('/admin/login', request.url);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
   }
 
@@ -19,5 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/messages', '/admin/content'],
 };
