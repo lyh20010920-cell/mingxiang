@@ -54,9 +54,9 @@ export default function AdminLoginPage() {
       setSuccess(true);
       setLoading(false);
       
-      // 延迟跳转
+      // 使用 window.location 跳转
       setTimeout(() => {
-        router.push('/admin/messages');
+        window.location.href = '/admin/messages';
       }, 1500);
       
     } catch {
@@ -78,12 +78,13 @@ export default function AdminLoginPage() {
             <div className="text-green-500 text-5xl mb-4">✓</div>
             <h2 className="text-xl font-bold text-green-600 mb-4">登录成功！</h2>
             <p className="text-gray-500 mb-4">正在跳转到后台...</p>
-            <a 
-              href="/admin/messages" 
+            <button 
+              type="button"
+              onClick={() => window.location.href = '/admin/messages'}
               className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-dark"
             >
               点击进入后台
-            </a>
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
