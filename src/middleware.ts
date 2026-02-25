@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   // 只保护 /admin/messages 和 /admin/content 路由
   if (pathname === '/admin/messages' || pathname === '/admin/content') {
-    const token = request.cookies.get('admin_token');
+    const token = request.cookies.get('admin_token')?.value;
     
     if (!token || !verifyToken(token)) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
