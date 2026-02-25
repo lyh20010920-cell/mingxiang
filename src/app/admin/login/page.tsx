@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
@@ -9,6 +9,25 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  // 检查是否已登录
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/check', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        if (res.ok) {
+          router.push('/admin/messages');
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +39,7 @@ export default function AdminLoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -30,11 +50,14 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // 登录成功，延迟跳转确保Cookie已保存
+      // 登录成功
+      setSuccess(true);
+      setLoading(false);
+      
+      // 延迟跳转
       setTimeout(() => {
-        window.location.href = '/admin/messages';
-      }, 200);
-      window.location.href = '/admin/messages';
+        router.push('/admin/messages');
+      }, 1500);
       
     } catch {
       setError('网络错误，请重试');
@@ -50,49 +73,63 @@ export default function AdminLoginPage() {
           <p className="text-gray-500 mt-2">明祥精密零件管理系统</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              用户名
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="请输入用户名"
-              required
-            />
+        {success ? (
+          <div className="text-center py-8">
+            <div className="text-green-500 text-5xl mb-4">✓</div>
+            <h2 className="text-xl font-bold text-green-600 mb-4">登录成功！</h2>
+            <p className="text-gray-500 mb-4">正在跳转到后台...</p>
+            <a 
+              href="/admin/messages" 
+              className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-dark"
+            >
+              点击进入后台
+            </a>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              密码
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="请输入密码"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
-              {error}
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                用户名
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="请输入用户名"
+                required
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-          >
-            {loading ? '登录中...' : '登录'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                密码
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="请输入密码"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+            >
+              {loading ? '登录中...' : '登录'}
+            </button>
+          </form>
+        )}
 
         <div className="mt-6 text-center">
           <a href="/" className="text-primary hover:underline text-sm">
