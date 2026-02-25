@@ -24,17 +24,15 @@ export default function AdminLoginPage() {
 
       const data = await res.json();
 
-      // 检查 HTTP 状态和数据中的 success 字段
       if (!res.ok || !data.success) {
         setError(data.error || data.message || '登录失败');
         setLoading(false);
         return;
       }
 
-      // 登录成功，使用 router 跳转
-      router.push('/admin/messages');
+      // 登录成功，跳转到后台
       window.location.href = '/admin/messages';
-
+      
     } catch {
       setError('网络错误，请重试');
       setLoading(false);
