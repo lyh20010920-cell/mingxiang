@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,14 +18,15 @@ export default function AdminLoginPage() {
           credentials: 'include'
         });
         if (res.ok) {
-          router.push('/admin/messages');
+          // 使用 window.location 跳转确保Cookie被发送
+          window.location.href = '/admin/messages';
         }
       } catch (e) {
         // ignore
       }
     };
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
