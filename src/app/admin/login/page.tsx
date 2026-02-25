@@ -30,7 +30,10 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // 登录成功，跳转到后台
+      // 登录成功，延迟跳转确保Cookie已保存
+      setTimeout(() => {
+        window.location.href = '/admin/messages';
+      }, 200);
       window.location.href = '/admin/messages';
       
     } catch {
