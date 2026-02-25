@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 只保护 /admin/messages 和 /admin/content 路由
-  if (pathname === '/admin/messages' || pathname === '/admin/content') {
+  if (pathname.startsWith('/admin/messages') || pathname.startsWith('/admin/content')) {
     const token = request.cookies.get('admin_token')?.value;
     
     if (!token || !verifyToken(token)) {
@@ -18,5 +18,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/messages', '/admin/content'],
+  matcher: [
+    '/admin/messages/:path*',
+    '/admin/content/:path*'
+  ],
 };
