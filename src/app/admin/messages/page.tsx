@@ -28,7 +28,8 @@ export default function AdminMessagesPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/messages?status=${statusFilter}&page=${page}&limit=10`
+        `/api/messages?status=${statusFilter}&page=${page}&limit=10`,
+        { credentials: 'include' }
       );
       const data = await res.json();
 
@@ -56,6 +57,7 @@ export default function AdminMessagesPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status }),
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -70,7 +72,7 @@ export default function AdminMessagesPage() {
     if (!confirm('确定要删除这条留言吗？')) return;
 
     try {
-      const res = await fetch(`/api/messages?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/messages?id=${id}`, { method: 'DELETE', credentials: 'include' });
       if (res.ok) {
         fetchMessages();
       }
@@ -80,7 +82,7 @@ export default function AdminMessagesPage() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     router.push('/admin/login');
   };
 

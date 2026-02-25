@@ -28,7 +28,7 @@ export default function AdminContentPage() {
   const fetchContent = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/content');
+      const res = await fetch('/api/content', { credentials: 'include' });
       const data = await res.json();
       setContent(data.content || {});
     } catch {
@@ -51,6 +51,7 @@ export default function AdminContentPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, value }),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -69,7 +70,7 @@ export default function AdminContentPage() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     router.push('/admin/login');
   };
 
