@@ -31,7 +31,8 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // 使用 window.location 强制页面跳转，确保 Cookie 被发送
+      // 登录成功，使用 router 跳转
+      router.push('/admin/messages');
       window.location.href = '/admin/messages';
 
     } catch {
