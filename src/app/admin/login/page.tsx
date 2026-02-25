@@ -49,7 +49,14 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // 登录成功 - 显示成功状态并刷新页面
+      // 登录成功 - 直接跳转
+      setSuccess(true);
+      setLoading(false);
+      
+      // 延迟后使用 window.location 跳转
+      setTimeout(() => {
+        window.location.href = '/admin/messages';
+      }, 500);
       setSuccess(true);
       setLoading(false);
       
