@@ -24,13 +24,16 @@ export default function AdminLoginPage() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || '登录失败');
+      // 检查 HTTP 状态和数据中的 success 字段
+      if (!res.ok || !data.success) {
+        setError(data.error || data.message || '登录失败');
         setLoading(false);
         return;
       }
 
-      router.push('/admin/messages');
+      // 使用 window.location 强制页面跳转，确保 Cookie 被发送
+      window.location.href = '/admin/messages';
+
     } catch {
       setError('网络错误，请重试');
       setLoading(false);
