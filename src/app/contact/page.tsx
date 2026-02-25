@@ -1,19 +1,51 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { BreadcrumbSchema } from '@/components/SchemaScript';
 
-export const metadata: Metadata = {
-  title: '联系我们',
-  description: '联系明祥精密零件有限公司，地址：江苏省苏州市工业园区XX路XX号，电话：400-888-8888，邮箱：info@mingxiang-parts.com。欢迎咨询精密零件加工服务。',
-  keywords: ['联系我们', '明祥联系方式', '精密零件咨询', '零件加工报价', '苏州机械加工'],
-  openGraph: {
-    title: '联系我们 - 明祥精密零件有限公司',
-    description: '联系明祥精密零件有限公司，欢迎咨询精密零件加工服务。',
-  },
-};
-
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    company: '',
+    type: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    setSubmitSuccess(false);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSubmitSuccess(true);
+        setFormData({ name: '', phone: '', email: '', company: '', type: '', message: '' });
+      } else {
+        setError(data.error || '提交失败，请稍后重试');
+      }
+    } catch {
+      setError('网络错误，请稍后重试');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const contactInfo = [
     { icon: '📍', title: '公司地址', lines: ['江苏省苏州市工业园区XX路XX号'] },
     { icon: '📞', title: '联系电话', lines: ['400-888-8888', '0512-12345678'] },
@@ -52,7 +84,17 @@ export default function ContactPage() {
               <div className="md:col-span-2">
                 <h2 className="text-2xl font-bold mb-2">在线留言</h2>
                 <p className="text-gray-500 mb-8">请填写以下信息，我们会尽快与您联系</p>
-                <form className="bg-gray-50 p-8 rounded-xl">
+                <form onSubmit={handleSubmit} className="bg-gray-50 p-8 rounded-xl">
+                  {submitSuccess && (
+                    <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-6">
+                      留言提交成功！我们会尽快与您联系。
+                    </div>
+                  )}
+                  {error && (
+                    <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-6">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label className="block mb-2 font-medium">
@@ -60,6 +102,8 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="请输入您的姓名"
                         required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
@@ -71,6 +115,8 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="请输入您的联系电话"
                         required
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
@@ -82,6 +128,8 @@ export default function ContactPage() {
                       <label className="block mb-2 font-medium">邮箱</label>
                       <input
                         type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="请输入您的邮箱"
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
                       />
@@ -90,6 +138,8 @@ export default function ContactPage() {
                       <label className="block mb-2 font-medium">公司名称</label>
                       <input
                         type="text"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         placeholder="请输入您的公司名称"
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
                       />
@@ -97,7 +147,11 @@ export default function ContactPage() {
                   </div>
                   <div className="mb-6">
                     <label className="block mb-2 font-medium">咨询类型</label>
-                    <select className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                    <select
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+                    >
                       <option value="">请选择咨询类型</option>
                       <option value="quote">询价报价</option>
                       <option value="sample">打样需求</option>
@@ -110,14 +164,20 @@ export default function ContactPage() {
                       留言内容 <span className="text-red-500">*</span>
                     </label>
                     <textarea
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       rows={5}
                       placeholder="请详细描述您的需求，如零件材质、数量、精度要求等"
                       required
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary resize-none"
                     ></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary w-full">
-                    提交留言
+                  <button 
+                    type="submit" 
+                    disabled={submitting}
+                    className="btn btn-primary w-full disabled:opacity-50"
+                  >
+                    {submitting ? '提交中...' : '提交留言'}
                   </button>
                 </form>
               </div>
